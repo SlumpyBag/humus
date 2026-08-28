@@ -1,0 +1,265 @@
+# Vector Art Demo for Humus
+# Demonstrates vector image creation and SVG export
+
+print("=== Humus Vector Graphics Demo ===\n");
+
+# Create a canvas
+let canvas = createVectorImage(800, 600);
+print("Created canvas: 800x600");
+
+# Draw basic shapes
+print("\nDrawing shapes...");
+
+# Background rectangle
+canvas.addRect(
+    vec2(0, 0),
+    vec2(800, 600),
+    stroke(0, 0, 0, 0),      # No stroke
+    fill(240, 240, 255),     # Light blue background
+    0
+);
+
+# Concentric circles
+print("Drawing concentric circles...");
+for (r = 50; r <= 200; r += 30) {
+    canvas.addCircle(
+        vec2(200, 150),
+        r,
+        stroke(0, 100, 200, 200),
+        fill(255, 255, 255, 50),
+        3
+    );
+}
+
+# Grid of rectangles
+print("Drawing grid pattern...");
+for (x = 400; x < 700; x += 50) {
+    for (y = 50; y < 300; y += 50) {
+        let hue = (x + y) % 255;
+        canvas.addRect(
+            vec2(x, y),
+            vec2(40, 40),
+            stroke(hue, 100, 100),
+            fill(hue, 200, 150, 180),
+            2
+        );
+    }
+}
+
+# Radial lines from center
+print("Drawing radial lines...");
+let centerX = 600;
+let centerY = 450;
+let radius = 120;
+
+for (angle = 0; angle < 360; angle += 15) {
+    let rad = angle * PI / 180;
+    let endX = centerX + cos(rad) * radius;
+    let endY = centerY + sin(rad) * radius;
+    
+    canvas.addLine(
+        vec2(centerX, centerY),
+        vec2(endX, endY),
+        stroke(angle % 255, 100, 100),
+        2
+    );
+}
+
+# Bezier-like curve approximation using multiple lines
+print("Drawing curves...");
+function drawCurve(start, control, end, segments) {
+    for (i = 0; i < segments; i++) {
+        let t1 = i / segments;
+        let t2 = (i + 1) / segments;
+        
+        # Quadratic bezier point calculation
+        let x1 = (1-t1)*(1-t1)*start.x + 2*(1-t1)*t1*control.x + t2*t2*end.x;
+        let y1 = (1-t1)*(1-t1)*start.y + 2*(1-t1)*t1*control.y + t2*t2*end.y;
+        let x2 = (1-t2)*(1-t2)*start.x + 2*(1-t2)*t2*control.x + t2*t2*end.x;
+        let y2 = (1-t2)*(1-t2)*start.y + 2*(1-t2)*t2*control.y + t2*t2*end.y;
+        
+        canvas.addLine(
+            vec2(x1, y1),
+            vec2(x2, y2),
+            stroke(100, 50, 200),
+            3
+        );
+    }
+}
+
+drawCurve(vec2(100, 400), vec2(200, 550), vec2(350, 400), 20);
+drawCurve(vec2(100, 500), vec2(200, 350), vec2(350, 500), 20);
+
+# Text placeholder (represented as rectangles for now)
+print("Adding text placeholder...");
+canvas.addRect(
+    vec2(450, 350),
+    vec2(300, 80),
+    stroke(50, 50, 50),
+    fill(255, 255, 200),
+    2
+);
+
+# Complex shape: house
+print("Drawing house...");
+# Base
+canvas.addRect(
+    vec2(500, 400),
+    vec2(150, 150),
+    stroke(100, 50, 50),
+    fill(200, 150, 100),
+    3
+);
+
+# Roof (using lines to form triangle)
+canvas.addLine(vec2(490, 400), vec2(575, 320), stroke(150, 50, 50), 3);
+canvas.addLine(vec2(575, 320), vec2(660, 400), stroke(150, 50, 50), 3);
+
+# Door
+canvas.addRect(
+    vec2(560, 475),
+    vec2(50, 75),
+    stroke(80, 40, 40),
+    fill(100, 60, 40),
+    2
+);
+
+# Window
+canvas.addRect(
+    vec2(520, 420),
+    vec2(30, 30),
+    stroke(60, 60, 60),
+    fill(150, 200, 255),
+    2
+);
+
+canvas.addRect(
+    vec2(600, 420),
+    vec2(30, 30),
+    stroke(60, 60, 60),
+    fill(150, 200, 255),
+    2
+);
+
+# Sun with rays
+print("Drawing sun...");
+canvas.addCircle(
+    vec2(700, 80),
+    40,
+    stroke(255, 200, 0),
+    fill(255, 255, 0),
+    2
+);
+
+# Sun rays
+for (i = 0; i < 12; i++) {
+    let angle = i * 30 * PI / 180;
+    let innerR = 45;
+    let outerR = 60;
+    
+    canvas.addLine(
+        vec2(700 + cos(angle) * innerR, 80 + sin(angle) * innerR),
+        vec2(700 + cos(angle) * outerR, 80 + sin(angle) * outerR),
+        stroke(255, 200, 0),
+        3
+    );
+}
+
+# Save as SVG
+print("\nSaving vector image...");
+canvas.saveSVG("vector_art.svg");
+print("Saved to vector_art.svg");
+
+# Also render to window for preview
+print("Opening preview window...");
+let win = createWindow(800, 600, "Humus Vector Art Preview");
+canvas.render(win);
+
+# Create additional art pieces
+print("\nCreating gallery...");
+
+function createAbstractArt(width, height) {
+    let art = createVectorImage(width, height);
+    
+    # Random abstract shapes
+    for (i = 0; i < 50; i++) {
+        let x = Math.random() * width;
+        let y = Math.random() * height;
+        let size = Math.random() * 50 + 10;
+        let r = Math.random() * 255;
+        let g = Math.random() * 255;
+        let b = Math.random() * 255;
+        
+        if (Math.random() > 0.5) {
+            art.addCircle(
+                vec2(x, y),
+                size/2,
+                stroke(r, g, b),
+                fill(r, g, b, 100),
+                2
+            );
+        } else {
+            art.addRect(
+                vec2(x, y),
+                vec2(size, size),
+                stroke(r, g, b),
+                fill(r, g, b, 100),
+                2
+            );
+        }
+    }
+    
+    return art;
+}
+
+# Generate 3 abstract pieces
+for (i = 0; i < 3; i++) {
+    let abstract = createAbstractArt(400, 300);
+    abstract.saveSVG("abstract_" + i + ".svg");
+    print("Created abstract art #" + i);
+}
+
+# Create a mandala
+print("\nCreating mandala...");
+let mandala = createVectorImage(500, 500);
+let cx = 250, cy = 250;
+
+for (layer = 0; layer < 8; layer++) {
+    let radius = 30 + layer * 25;
+    let petals = 8 + layer * 4;
+    let hue = layer * 30;
+    
+    for (p = 0; p < petals; p++) {
+        let angle = p * 360 / petals * PI / 180;
+        let px = cx + cos(angle) * radius;
+        let py = cy + sin(angle) * radius;
+        
+        mandala.addCircle(
+            vec2(px, py),
+            15,
+            stroke(hue, 150, 200),
+            fill(hue, 200, 150, 180),
+            2
+        );
+    }
+}
+
+mandala.addCircle(vec2(cx, cy), 20, stroke(0, 0, 0), fill(255, 255, 0), 2);
+mandala.saveSVG("mandala.svg");
+print("Mandala saved to mandala.svg");
+
+# Export summary
+print("\n=== Vector Art Demo Complete ===");
+print("Files created:");
+print("  - vector_art.svg (main artwork)");
+print("  - abstract_0.svg (abstract piece 1)");
+print("  - abstract_1.svg (abstract piece 2)");
+print("  - abstract_2.svg (abstract piece 3)");
+print("  - mandala.svg (mandala pattern)");
+
+# SVG file info
+print("\nSVG files can be:");
+print("  - Opened in any web browser");
+print("  - Edited in vector graphics software (Inkscape, Illustrator)");
+print("  - Scaled to any size without quality loss");
+print("  - Converted to other formats (PNG, PDF, etc.)");

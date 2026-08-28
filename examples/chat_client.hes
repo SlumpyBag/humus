@@ -1,0 +1,229 @@
+# P2P Chat Client Demo for Humus
+# Demonstrates peer-to-peer networking capabilities
+
+print("=== Humus P2P Chatroom Demo ===\n");
+
+# Configuration
+let SERVER_HOST = "127.0.0.1";
+let SERVER_PORT = 8080;
+let USERNAME = "HumusUser_" + Math.floor(Math.random() * 1000);
+
+print("Username: " + USERNAME);
+print("Target server: " + SERVER_HOST + ":" + SERVER_PORT);
+
+# Create chatroom
+print("\nInitializing chatroom...");
+let room = createChatroom();
+
+# Event handlers
+room.onConnect(function(success) {
+    if (success) {
+        print("✓ Connected to chatroom!");
+        print("  Peer count: " + room.getPeerCount());
+    } else {
+        print("✗ Failed to connect");
+    }
+});
+
+room.onDisconnect(function() {
+    print("\nDisconnected from chatroom");
+});
+
+room.onMessage(function(msg) {
+    let timestamp = formatTime(msg.timestamp);
+    print("[" + timestamp + "] " + msg.sender + ": " + msg.message);
+});
+
+room.onPeerJoin(function(peer) {
+    print("→ " + peer.name + " joined the chat");
+});
+
+room.onPeerLeave(function(peer) {
+    print("← " + peer.name + " left the chat");
+});
+
+# Connect to server
+print("\nConnecting...");
+let connected = room.connect(SERVER_HOST, SERVER_PORT);
+
+if (connected) {
+    print("Connection established!\n");
+    
+    # Send introduction message
+    room.send("Hello! I'm " + USERNAME + " running on Humus v" + version());
+    
+    # Simulate chat conversation
+    print("Simulating conversation...\n");
+    
+    let messages = [
+        "Testing P2P capabilities of Humus",
+        "This is a demo of the chat system",
+        "Messages can contain Unicode: 你好世界 🌍",
+        "The framework supports real-time communication"
+    ];
+    
+    for (msg in messages) {
+        room.send(msg);
+        wait(500);  # Wait 500ms between messages
+    }
+    
+    # Check for incoming messages
+    print("\nChecking for messages...");
+    while (room.hasMessages()) {
+        let msg = room.receive();
+        print("Received: " + msg.sender + " said \"" + msg.message + "\"");
+    }
+    
+    # Get peer list
+    let peers = room.getPeers();
+    print("\nConnected peers (" + peers.length + "):");
+    for (peer in peers) {
+        print("  - " + peer.name + " at " + peer.address);
+    }
+    
+    # Send private message (if supported)
+    if (peers.length > 0) {
+        let targetPeer = peers[0];
+        room.sendPrivate(targetPeer.id, "This is a private message");
+        print("\nSent private message to " + targetPeer.name);
+    }
+    
+    # Share a file (simulated)
+    print("\nFile sharing demo...");
+    let fileInfo = {
+        name: "demo.txt",
+        size: 1024,
+        type: "text/plain",
+        hash: "abc123def456"
+    };
+    
+    room.shareFile(fileInfo);
+    print("Shared file info: " + fileInfo.name + " (" + fileInfo.size + " bytes)");
+    
+    # Get chat history
+    print("\nChat History:");
+    let history = room.getHistory(10);  # Last 10 messages
+    for (entry in history) {
+        print("  [" + entry.time + "] " + entry.sender + ": " + entry.message);
+    }
+    
+    # Statistics
+    print("\n=== Chat Statistics ===");
+    print("Messages sent: " + room.stats.messagesSent);
+    print("Messages received: " + room.stats.messagesReceived);
+    print("Bytes transferred: " + room.stats.bytesTransferred);
+    print("Connection uptime: " + room.stats.uptime + "ms");
+    
+    # Keep connection alive and listen
+    print("\nListening for messages (press Ctrl+C to exit)...");
+    print("(Simulation - would normally run indefinitely)\n");
+    
+    # Simulate receiving messages
+    wait(1000);
+    
+} else {
+    print("Failed to connect to server");
+    print("Make sure a Humus chat server is running on " + SERVER_HOST + ":" + SERVER_PORT);
+}
+
+# Cleanup
+print("\nCleaning up...");
+room.disconnect();
+destroyChatroom(room);
+
+print("\n=== Demo Complete ===");
+
+# Additional features demonstration
+print("\n=== Advanced Features ===\n");
+
+# Create multiple chat rooms
+let rooms = [];
+
+for (i = 0; i < 3; i++) {
+    let newRoom = createChatroom();
+    newRoom.setName("Room_" + i);
+    
+    if (newRoom.connect(SERVER_HOST, SERVER_PORT + i)) {
+        newRoom.send("Hello from Room_" + i);
+        rooms.push(newRoom);
+        print("Created and connected: Room_" + i);
+    }
+}
+
+# Bridge messages between rooms
+print("\nSetting up room bridging...");
+function bridgeRooms(room1, room2) {
+    room1.onMessage(function(msg) {
+        room2.send("[Bridge] " + msg.sender + ": " + msg.message);
+    });
+    
+    room2.onMessage(function(msg) {
+        room1.send("[Bridge] " + msg.sender + ": " + msg.message);
+    });
+}
+
+if (rooms.length >= 2) {
+    bridgeRooms(rooms[0], rooms[1]);
+    print("Bridged Room_0 and Room_1");
+}
+
+# Encryption demo (if supported)
+print("\nEncryption demo...");
+let secureRoom = createChatroom();
+secureRoom.enableEncryption(true);
+secureRoom.setEncryptionKey("my-secret-key-123");
+print("Encryption enabled with AES-256");
+
+# Voice/Video capability check
+print("\nMedia capabilities:");
+print("  Audio support: " + hasAudioSupport());
+print("  Video support: " + hasVideoSupport());
+
+# Clean up all rooms
+print("\nClosing all connections...");
+for (r in rooms) {
+    r.disconnect();
+}
+secureRoom.disconnect();
+
+print("\nAll connections closed.");
+
+# Helper functions
+function formatTime(timestamp) {
+    let date = new Date(timestamp);
+    return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+}
+
+function wait(ms) {
+    # In real implementation, this would yield control
+    # For demo purposes, just acknowledge
+    print("  (waiting " + ms + "ms...)");
+}
+
+# Network utilities demo
+print("\n=== Network Utilities ===\n");
+
+# Get local network info
+let netInfo = getNetworkInfo();
+print("Local IP: " + netInfo.localIP);
+print("External IP: " + netInfo.externalIP);
+print("Hostname: " + netInfo.hostname);
+
+# Port scanning (educational purpose)
+print("\nScanning common ports on localhost...");
+let commonPorts = [21, 22, 80, 443, 8080, 8443];
+for (port in commonPorts) {
+    let isOpen = checkPort("127.0.0.1", port);
+    if (isOpen) {
+        print("  Port " + port + ": OPEN");
+    }
+}
+
+# Bandwidth test
+print("\nBandwidth test...");
+let bwResult = bandwidthTest(SERVER_HOST, SERVER_PORT);
+print("  Download: " + bwResult.download + " KB/s");
+print("  Upload: " + bwResult.upload + " KB/s");
+print("  Latency: " + bwResult.latency + "ms");
+
+print("\n=== P2P Chat Demo Complete ===");
