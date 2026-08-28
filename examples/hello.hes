@@ -1,0 +1,128 @@
+# Humus Executable Script
+print("Hello, World!");
+print("Welcome to Humus v" + version());
+
+# Variables
+let name = "Developer";
+let age = 25;
+let pi = 3.14159;
+
+# Functions
+function greet(person) {
+    print("Hello, " + person + "!");
+}
+
+greet(name);
+
+# Math operations
+let x = 10;
+let y = 5;
+print("Sum: " + (x + y));
+print("Product: " + (x * y));
+
+# Control flow
+for (i = 0; i < 5; i++) {
+    print("Count: " + i);
+}
+
+if (age > 18) {
+    print("You are an adult");
+}
+
+# Arrays
+let numbers = [1, 2, 3, 4, 5];
+for (n in numbers) {
+    print("Number: " + n);
+}
+
+# Classes
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    
+    speak() {
+        print(this.name + " makes a sound");
+    }
+}
+
+class Dog extends Animal {
+    speak() {
+        print(this.name + " barks");
+    }
+}
+
+let dog = new Dog("Buddy");
+dog.speak();
+
+print("\n=== Graphics Demo ===");
+
+# Create a window
+let win = createWindow(800, 600, "Humus Graphics");
+
+# Create buttons
+let btn = createButton(100, 100, 200, 50, "Click Me!");
+btn.onClick(function() {
+    print("Button clicked!");
+});
+
+# Graph a function
+let graph = createGraph("Sine Wave");
+graph.plotFunction(sin, 0, PI * 2, 100);
+
+print("\n=== 3D Calculations ===");
+
+# 3D point transformations
+let point = vec3(1, 0, 0);
+let rotated = rotateY(point, PI / 4);
+print("Rotated point: " + rotated);
+
+print("\n=== Ray Tracing ===");
+
+# Create a scene
+let world = createWorld();
+world.addSphere(vec3(0, 0, -3), 1, color(255, 100, 100));
+world.addSphere(vec3(2, 0, -4), 1, color(100, 255, 100));
+world.addSphere(vec3(-2, 0, -4), 1, color(100, 100, 255));
+
+# Render
+let pixels = renderScene(world, vec3(0, 0, 0), 640, 480);
+print("Rendered " + (640 * 480) + " pixels");
+
+print("\n=== Web Interaction ===");
+
+# HTTP GET request
+let response = httpGet("https://api.example.com/data");
+print("Status: " + response.statusCode);
+print("Body: " + response.body);
+
+# HTTP POST
+let postData = {"name": "test", "value": 123};
+let postResponse = httpPost("https://api.example.com/submit", postData);
+
+print("\n=== P2P Chat ===");
+
+# Join chatroom
+let room = createChatroom();
+room.connect("127.0.0.1", 8080);
+room.send("Hello from Humus!");
+
+# Receive messages
+while (room.hasMessages()) {
+    let msg = room.receive();
+    print(msg.sender + ": " + msg.message);
+}
+
+print("\n=== Vector Images ===");
+
+# Create vector art
+let img = createVectorImage(400, 300);
+img.addCircle(vec2(200, 150), 100, stroke(0, 0, 0), fill(200, 200, 255), 2);
+img.addRect(vec2(50, 50), vec2(100, 80), stroke(255, 0, 0), fill(255, 255, 0, 128), 3);
+img.addLine(vec2(0, 0), vec2(400, 300), stroke(0, 255, 0), 5);
+
+# Save as SVG
+img.saveSVG("my_art.svg");
+print("Saved vector image to my_art.svg");
+
+print("\nProgram completed successfully!");

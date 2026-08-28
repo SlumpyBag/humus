@@ -1,0 +1,95 @@
+# Graphing Demo for Humus
+# Demonstrates mathematical function plotting
+
+print("=== Humus Graphing Demo ===\n");
+
+# Create a graph window
+let graph = createGraph("Mathematical Functions");
+
+# Plot sine wave
+print("Plotting sine wave...");
+graph.plotFunction(sin, 0, PI * 2, 200);
+graph.setColor(color(255, 0, 0));
+
+# Plot cosine wave
+print("Plotting cosine wave...");
+graph.plotFunction(cos, 0, PI * 2, 200);
+graph.setColor(color(0, 255, 0));
+
+# Plot tangent (with limited range to avoid asymptotes)
+print("Plotting tangent...");
+graph.plotFunction(tan, -PI/2 + 0.1, PI/2 - 0.1, 100);
+graph.setColor(color(0, 0, 255));
+
+# Custom function: damped oscillation
+function dampedOscillation(x) {
+    return exp(-x/5) * sin(x);
+}
+
+print("Plotting damped oscillation...");
+graph.plotFunction(dampedOscillation, 0, 20, 300);
+graph.setColor(color(255, 255, 0));
+
+# Polynomial function
+function cubic(x) {
+    return x*x*x - 3*x;
+}
+
+print("Plotting cubic polynomial...");
+graph.plotFunction(cubic, -3, 3, 150);
+graph.setColor(color(255, 0, 255));
+
+# Exponential growth
+print("Plotting exponential...");
+graph.plotFunction(exp, -2, 3, 100);
+graph.setColor(color(0, 255, 255));
+
+# Add data points manually
+print("Adding custom data points...");
+for (i = 0; i < 50; i++) {
+    let x = i * 0.1;
+    let y = sin(x) * cos(x * 2);
+    graph.addPoint(x, y);
+}
+
+# Render the graph
+print("\nRendering graph with multiple functions...");
+let win = createWindow(1024, 768, "Humus Graph Viewer");
+graph.render(win);
+
+# Calculate some statistics
+print("\n=== Function Analysis ===");
+
+# Find roots of cubic function using numerical methods
+function findRoot(func, start, end, steps) {
+    let step = (end - start) / steps;
+    for (x = start; x < end; x += step) {
+        if (func(x) * func(x + step) < 0) {
+            # Sign change detected, root exists
+            print("Root found near x = " + x);
+        }
+    }
+}
+
+print("Finding roots of x³ - 3x:");
+findRoot(cubic, -3, 3, 1000);
+
+# Calculate area under curve using Riemann sum
+function riemannSum(func, start, end, n) {
+    let dx = (end - start) / n;
+    let sum = 0;
+    for (i = 0; i < n; i++) {
+        let x = start + i * dx;
+        sum += func(x) * dx;
+    }
+    return sum;
+}
+
+let area = riemannSum(cubic, 0, 2, 1000);
+print("Area under x³ - 3x from 0 to 2: " + area);
+
+# Save graph to file
+graph.saveImage("graph_output.png");
+print("\nGraph saved to graph_output.png");
+
+print("\nGraphing demo complete!");

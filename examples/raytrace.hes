@@ -1,0 +1,177 @@
+# Ray Tracing Demo for Humus
+# Demonstrates 3D ray tracing capabilities
+
+print("=== Humus Ray Tracing Engine ===\n");
+
+# Create a 3D world
+let world = createWorld();
+
+# Add spheres with different materials
+print("Creating scene...");
+
+# Red sphere (center)
+world.addSphere(
+    vec3(0, 0, -5),
+    1.0,
+    color(255, 50, 50)
+);
+
+# Green sphere (left)
+world.addSphere(
+    vec3(-2.5, 0, -6),
+    1.0,
+    color(50, 255, 50)
+);
+
+# Blue sphere (right)
+world.addSphere(
+    vec3(2.5, 0, -6),
+    1.0,
+    color(50, 50, 255)
+);
+
+# Yellow sphere (floating above)
+world.addSphere(
+    vec3(0, 2, -5),
+    0.7,
+    color(255, 255, 50)
+);
+
+# Small purple sphere
+world.addSphere(
+    vec3(1.5, -1, -4),
+    0.5,
+    color(200, 50, 200)
+);
+
+# Camera position
+let cameraPos = vec3(0, 0, 0);
+
+# Render settings
+let width = 800;
+let height = 600;
+let maxDepth = 10;
+
+print("Scene contains " + world.sphereCount() + " spheres");
+print("Render resolution: " + width + "x" + height);
+print("Ray depth: " + maxDepth);
+
+# Render the scene
+print("\nRendering...");
+let startTime = getTime();
+
+let pixels = renderScene(world, cameraPos, width, height, maxDepth);
+
+let endTime = getTime();
+let renderTime = endTime - startTime;
+
+print("Render completed in " + renderTime + "ms");
+
+# Calculate rays per second
+let totalRays = width * height;
+let raysPerSecond = totalRays / (renderTime / 1000);
+print("Performance: " + raysPerSecond + " rays/second");
+
+# Save the rendered image
+saveImage(pixels, width, height, "raytrace_output.png");
+print("Image saved to raytrace_output.png");
+
+# Interactive viewer
+print("\n=== Interactive Viewer ===");
+let win = createWindow(width, height, "Humus Ray Tracer Viewer");
+
+# Animation controls
+let btnRotate = createButton(10, 10, 100, 40, "Rotate");
+let btnZoom = createButton(120, 10, 100, 40, "Zoom");
+let btnReset = createButton(230, 10, 100, 40, "Reset");
+
+btnRotate.onClick(function() {
+    print("Rotating camera...");
+    # Rotation logic would go here
+});
+
+btnZoom.onClick(function() {
+    print("Zooming...");
+    # Zoom logic would go here
+});
+
+btnReset.onClick(function() {
+    print("Resetting view...");
+    cameraPos = vec3(0, 0, 0);
+});
+
+# Advanced features demonstration
+print("\n=== Advanced Features ===");
+
+# Create multiple scenes
+let scenes = [];
+
+for (i = 0; i < 5; i++) {
+    let scene = createWorld();
+    
+    # Random sphere placement
+    for (j = 0; j < 10; j++) {
+        let x = (Math.random() - 0.5) * 10;
+        let y = (Math.random() - 0.5) * 10;
+        let z = -5 - Math.random() * 5;
+        let r = Math.random() * 0.5 + 0.3;
+        
+        let r_col = Math.random() * 255;
+        let g_col = Math.random() * 255;
+        let b_col = Math.random() * 255;
+        
+        scene.addSphere(vec3(x, y, z), r, color(r_col, g_col, b_col));
+    }
+    
+    scenes.push(scene);
+}
+
+print("Created " + scenes.length + " random scenes");
+
+# Render each scene as thumbnail
+for (i = 0; i < scenes.length; i++) {
+    let thumb = renderScene(scenes[i], cameraPos, 200, 150, 5);
+    saveImage(thumb, 200, 150, "thumbnail_" + i + ".png");
+}
+
+print("Generated thumbnails");
+
+# Ray-sphere intersection demo
+print("\n=== Ray-Sphere Intersection Demo ===");
+
+let testSphere = hm_sphere_create(vec3(0, 0, -5), 1, color(255, 255, 255));
+let testRay = hm_ray_create(cameraPos, vec3(0, 0, -1));
+
+let hit = hm_ray_hit_sphere(testRay, testSphere);
+if (hit) {
+    print("Ray hit the sphere!");
+    print("Hit point: " + hit.point);
+    print("Normal: " + hit.normal);
+    print("Distance: " + hit.t);
+} else {
+    print("Ray missed the sphere");
+}
+
+# Export scene to JSON for external use
+let sceneData = {
+    spheres: [],
+    camera: cameraPos,
+    resolution: {width: width, height: height}
+};
+
+for (sphere in world.spheres) {
+    sceneData.spheres.push({
+        center: sphere.center,
+        radius: sphere.radius,
+        color: sphere.color
+    });
+}
+
+saveJSON(sceneData, "scene_export.json");
+print("Scene exported to scene_export.json");
+
+print("\n=== Ray Tracing Demo Complete ===");
+print("Files created:");
+print("  - raytrace_output.png (main render)");
+print("  - thumbnail_*.png (scene previews)");
+print("  - scene_export.json (scene data)");
